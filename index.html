@@ -145,28 +145,8 @@
     function saveData() {
       localStorage.setItem("sites", JSON.stringify(sites));
       localStorage.setItem("siteData", JSON.stringify(siteData));
+      console.log("Data saved:", sites, siteData);
     }
-
-    // Load from localStorage
-    window.onload = function(){
-      const savedSites = localStorage.getItem("sites");
-      const savedSiteData = localStorage.getItem("siteData");
-
-      if(savedSites && savedSiteData){
-        sites = JSON.parse(savedSites);
-        siteData = JSON.parse(savedSiteData);
-
-        const select=document.getElementById("perSiteSelect");
-        sites.forEach(site=>{
-          const option=document.createElement("option");
-          option.value=site;
-          option.textContent=site;
-          select.appendChild(option);
-        });
-
-        computePayroll();
-      }
-    };
 
     function pesoFormat(num) {
       return "₱" + (parseFloat(num)||0).toLocaleString("en-PH",{minimumFractionDigits:2, maximumFractionDigits:2});
@@ -372,9 +352,7 @@
       }
     }
 
-    function printSummary(){
-      window.print();
-    }
+    function printSummary(){ window.print(); }
 
     function printSitePayroll(){
       const site=document.getElementById("perSiteSelect").value;
@@ -429,6 +407,29 @@
       link.download="payroll.csv";
       link.click();
     }
+
+    // Load from localStorage on page start
+    window.onload = function(){
+      const savedSites = localStorage.getItem("sites");
+      const savedSiteData = localStorage.getItem("siteData");
+
+      if(savedSites && savedSiteData){
+        sites = JSON.parse(savedSites);
+        siteData = JSON.parse(savedSiteData);
+
+        const select=document.getElementById("perSiteSelect");
+        select.innerHTML = "";
+        sites.forEach(site=>{
+          const option=document.createElement("option");
+          option.value=site;
+          option.textContent=site;
+          select.appendChild(option);
+        });
+
+        computePayroll();
+        console.log("Data loaded:", sites, siteData);
+      }
+    };
   </script>
 </body>
 </html>
