@@ -5,66 +5,43 @@
   <title>D.M. MALIWANAG BUILDERS AND ENTERPRISES - Payroll System</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-    h1 { margin:0; font-size:32px; font-weight:bold; text-align:left; }
-    h2 { margin:0; font-size:24px; font-weight:normal; text-align:center; }
-    .by { text-align:center; font-size:16px; margin-bottom:15px; }
-    .date { text-align: center; margin: 20px 0; font-weight: bold; }
+    h1 { font-size:32px; text-align:center; margin-bottom: 10px; }
+    h2, h3 { text-align:center; margin:5px 0; }
+    .date { text-align: center; margin: 20px 0; }
     nav { text-align: center; margin-bottom: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #fff; }
-    th, td { padding: 8px; border: 1px solid #ccc; text-align: center; }
-    th { background: #333; color: #fff; }
-    input, select { padding: 4px; }
-    input[type=text] { text-transform: uppercase; width: 250px; }
-    input[type=number] { width: 100px; text-align: center; }
-    .nameInput { width: 100%; min-width:200px; text-transform: uppercase; box-sizing: border-box; }
-    button {
-      padding: 10px 18px;
-      background: linear-gradient(90deg, #004aad, #0073e6);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      margin: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-      transition: all 0.2s ease;
-    }
-    button:hover { background: linear-gradient(90deg, #0073e6, #004aad); transform: translateY(-2px); }
-    .hidden { display: none; }
-    #summary { margin-top: 30px; background: #fff; padding: 10px; border: 1px solid #ccc; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; background:#fff; }
+    th, td { border: 1px solid #000; padding: 6px; text-align: center; }
+    th { background:#333; color:#fff; }
+    .nameInput { width: 100%; text-transform: uppercase; }
+    button { padding:6px 12px; margin:4px; border:none; border-radius:8px; background:#0073e6; color:#fff; cursor:pointer; }
+    button:hover { background:#005bb5; }
+    .hidden { display:none; }
+    #summary { margin-top:20px; background:#fff; padding:10px; border:1px solid #ccc; }
   </style>
 </head>
 <body>
-  <!-- Header -->
-  <div style="display:flex;align-items:center;justify-content:center;gap:15px;">
-    <img src="DM LOGO.png" alt="Company Logo" style="height:120px;">
-    <div><h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1></div>
+  <div style="text-align:center;">
+    <h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1>
+    <h2>Payroll System</h2>
+    <p style="font-size:12px;">by: Wenjunzxc</p>
   </div>
 
-  <!-- Title -->
-  <div style="text-align:center;margin-top:5px;">
-    <h2 style="margin:5px 0;font-size:30px;">Payroll System</h2>
-    <div style="font-size:12px;">by: Wenjunzxc</div>
-  </div>
-
-  <!-- Payroll Period -->
   <div class="date">
     Payroll Period:
     <input type="date" id="payrollFrom"> to 
     <input type="date" id="payrollTo">
   </div>
 
-  <!-- Navigation -->
   <nav>
     <button onclick="showInterface('dashboard')">Dashboard</button>
     <button onclick="showInterface('site')">Per Site Payroll</button>
     <button onclick="addNewSite()">Add New Site</button>
+    <button onclick="clearAllData()">Clear All Data</button>
   </nav>
 
   <!-- DASHBOARD -->
   <div id="dashboardInterface">
-    <h2 style="text-align:center;">Welcome to the Payroll System</h2>
-    <p style="text-align:center;">This dashboard provides an overview of all projects and payroll summaries.</p>
+    <h2>Dashboard</h2>
     <div id="summary">
       <h3>Payroll Summary by Site</h3>
       <table id="siteSummary">
@@ -94,43 +71,38 @@
     </div>
   </div>
 
-  <!-- PER SITE -->
+  <!-- SITE PAYROLL -->
   <div id="siteInterface" class="hidden">
     <label for="perSiteSelect"><strong>Select Site:</strong></label>
     <select id="perSiteSelect" onchange="renderSiteTable()"></select>
-    <button onclick="addEmployeeToSite()">Add Employee to This Site</button>
+    <button onclick="addEmployeeToSite()">Add Employee</button>
     <button onclick="deleteSite()">Delete Site</button>
-    <button onclick="printSitePayroll()">Print This Site Payroll</button>
+    <button onclick="printSitePayroll()">Print This Site</button>
 
     <div id="sitePayrollArea">
       <table id="perSiteTable">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Rate/Day</th>
-            <th>Days Worked</th>
-            <th>OT Hours</th>
-            <th>Gross Pay</th>
-            <th>Cash Advance</th>
-            <th>Benefits</th>
-            <th>Net Pay</th>
-            <th>Signature</th>
+            <th>Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th>
+            <th>Gross Pay</th><th>Cash Advance</th><th>Benefits</th><th>Net Pay</th><th>Signature</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
       <br>
       <div id="perSiteSummary">
-        <h3>Summary for Selected Site</h3>
+        <h3>Site Totals</h3>
         <table>
-          <thead>
-            <tr>
-              <th>Total Gross</th>
-              <th>Total Deductions</th>
-              <th>Total Net</th>
-            </tr>
-          </thead>
-          <tbody id="perSiteSummaryBody"></tbody>
+          <tr>
+            <th>Total Gross</th>
+            <th>Total Deductions</th>
+            <th>Total Net</th>
+          </tr>
+          <tr>
+            <td id="siteTotalGross">₱0.00</td>
+            <td id="siteTotalDeductions">₱0.00</td>
+            <td id="siteTotalNet">₱0.00</td>
+          </tr>
         </table>
       </div>
     </div>
@@ -141,11 +113,31 @@
     let sites = [];
     let siteData = {};
 
-    // Save to localStorage
     function saveData() {
       localStorage.setItem("sites", JSON.stringify(sites));
       localStorage.setItem("siteData", JSON.stringify(siteData));
       console.log("Data saved:", sites, siteData);
+    }
+
+    function loadData(){
+      const savedSites = localStorage.getItem("sites");
+      const savedSiteData = localStorage.getItem("siteData");
+      if(savedSites && savedSiteData){
+        sites = JSON.parse(savedSites);
+        siteData = JSON.parse(savedSiteData);
+
+        const select=document.getElementById("perSiteSelect");
+        select.innerHTML = "";
+        sites.forEach(site=>{
+          const option=document.createElement("option");
+          option.value=site;
+          option.textContent=site;
+          select.appendChild(option);
+        });
+
+        computePayroll();
+        console.log("Data loaded:", sites, siteData);
+      }
     }
 
     function pesoFormat(num) {
@@ -198,11 +190,16 @@
       if(confirm("Are you sure you want to delete site: "+siteName+" ?")){
         sites=sites.filter(s=>s!==siteName);
         delete siteData[siteName];
-        [...select.options].forEach(opt=>{if(opt.value===siteName) opt.remove();});
+        select.innerHTML="";
+        sites.forEach(s=>{
+          const option=document.createElement("option");
+          option.value=s;
+          option.textContent=s;
+          select.appendChild(option);
+        });
         document.querySelector("#perSiteTable tbody").innerHTML="";
         document.getElementById("perSiteSummaryBody").innerHTML="";
         saveData();
-        alert("Site deleted successfully.");
       }
     }
 
@@ -227,24 +224,16 @@
         emp.gross=gross;emp.net=net;
         const row=document.createElement("tr");
         row.innerHTML=`
-          <td><input type="text" class="nameInput" style="width:auto;min-width:200px;" value="${emp.name}" 
-            oninput="this.value=this.value.toUpperCase(); updateEmployee('${site}',${idx},'name',this.value)" 
-            onkeydown="focusNext(event,this)" placeholder="NAME"></td>
-          <td><input type="number" value="${emp.rate?emp.rate:''}" class="rate" step="0.01" 
-            oninput="updateEmployee('${site}',${idx},'rate',this.value)" onkeydown="focusNext(event,this)" placeholder="₱"></td>
-          <td><input type="number" value="${emp.days?emp.days:''}" class="days" step="0.5"
-            onblur="validateHalfStep(this,'${site}',${idx},'days')" 
-            onkeydown="focusNext(event,this)" placeholder="Days (Max ${getMaxDays()})"></td>
-          <td><input type="number" value="${emp.ot?emp.ot:''}" class="ot" step="0.5"
-            onblur="validateHalfStep(this,'${site}',${idx},'ot')" 
-            onkeydown="focusNext(event,this)" placeholder="OT"></td>
-          <td class="gross">${pesoFormat(emp.gross)}</td>
-          <td><input type="number" value="${emp.advance?emp.advance:''}" class="advance" step="0.01"
-            oninput="updateEmployee('${site}',${idx},'advance',this.value)" onkeydown="focusNext(event,this)" placeholder="₱"></td>
-          <td><input type="number" value="${emp.benefits?emp.benefits:''}" class="benefits" step="0.01"
-            oninput="updateEmployee('${site}',${idx},'benefits',this.value)" onkeydown="focusNext(event,this)" placeholder="₱"></td>
-          <td class="net">${pesoFormat(emp.net)}</td>
-          <td style="height:40px;"></td>
+          <td><input type="text" class="nameInput" value="${emp.name}" 
+            oninput="this.value=this.value.toUpperCase(); updateEmployee('${site}',${idx},'name',this.value)"></td>
+          <td><input type="number" value="${emp.rate||''}" oninput="updateEmployee('${site}',${idx},'rate',this.value)"></td>
+          <td><input type="number" value="${emp.days||''}" oninput="updateEmployee('${site}',${idx},'days',this.value)"></td>
+          <td><input type="number" value="${emp.ot||''}" oninput="updateEmployee('${site}',${idx},'ot',this.value)"></td>
+          <td class="gross">${pesoFormat(emp.gross||0)}</td>
+          <td><input type="number" value="${emp.advance||''}" oninput="updateEmployee('${site}',${idx},'advance',this.value)"></td>
+          <td><input type="number" value="${emp.benefits||''}" oninput="updateEmployee('${site}',${idx},'benefits',this.value)"></td>
+          <td class="net">${pesoFormat(emp.net||0)}</td>
+          <td></td>
         `;
         tbody.appendChild(row);
       });
@@ -306,18 +295,7 @@
       updateDashboardSummary();
       updatePerSiteSummary();
       refreshTables();
-      saveData();
-    }
-
-    function refreshTables(){
-      const site=document.getElementById("perSiteSelect").value;
-      if(site&&siteData[site]){
-        const rows=document.querySelectorAll("#perSiteTable tbody tr");
-        rows.forEach((row,idx)=>{
-          row.querySelector(".gross").textContent=pesoFormat(siteData[site][idx].gross||0);
-          row.querySelector(".net").textContent=pesoFormat(siteData[site][idx].net||0);
-        });
-      }
+      saveData(); // <--- ensures data persists
     }
 
     function updateDashboardSummary(){
@@ -330,9 +308,11 @@
           <td>${pesoFormat(siteTotals[site].gross)}</td>
           <td>${pesoFormat(siteTotals[site].deductions)}</td>
           <td>${pesoFormat(siteTotals[site].net)}</td>
-          <td style="height:40px;"></td>
+          <td></td>
         </tr>`;
-        gGross+=siteTotals[site].gross; gDed+=siteTotals[site].deductions; gNet+=siteTotals[site].net;
+        gGross+=siteTotals[site].gross; 
+        gDed+=siteTotals[site].deductions; 
+        gNet+=siteTotals[site].net;
       }
       document.getElementById("grandGross").textContent=pesoFormat(gGross);
       document.getElementById("grandDeductions").textContent=pesoFormat(gDed);
@@ -341,15 +321,13 @@
 
     function updatePerSiteSummary(){
       const site=document.getElementById("perSiteSelect").value;
-      const tbody=document.getElementById("perSiteSummaryBody");
-      tbody.innerHTML="";
-      if(siteTotals[site]){
-        tbody.innerHTML=`<tr>
-          <td>${pesoFormat(siteTotals[site].gross)}</td>
-          <td>${pesoFormat(siteTotals[site].deductions)}</td>
-          <td>${pesoFormat(siteTotals[site].net)}</td>
+      const totals = siteTotals[site] || {gross:0,deductions:0,net:0};
+      document.getElementById("perSiteSummaryBody").innerHTML = `
+        <tr>
+          <td>${pesoFormat(totals.gross)}</td>
+          <td>${pesoFormat(totals.deductions)}</td>
+          <td>${pesoFormat(totals.net)}</td>
         </tr>`;
-      }
     }
 
     function printSummary(){ window.print(); }
@@ -357,20 +335,25 @@
     function printSitePayroll(){
       const site=document.getElementById("perSiteSelect").value;
       if(!site){alert("Please select a site first.");return;}
-      let rows=`<table border="1" cellspacing="0" cellpadding="5" width="auto">
-      <thead><tr>
-        <th>Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th>
-        <th>Gross Pay</th><th>Cash Advance</th><th>Benefits</th><th>Net Pay</th><th>Signature</th>
-      </tr></thead><tbody>`;
+
+      let rows="";
       siteData[site].forEach(emp=>{
         rows+=`<tr>
-          <td>${emp.name}</td><td>${pesoFormat(emp.rate)}</td><td>${emp.days}</td><td>${emp.ot}</td>
-          <td>${pesoFormat(emp.gross)}</td><td>${pesoFormat(emp.advance)}</td><td>${pesoFormat(emp.benefits)}</td><td>${pesoFormat(emp.net)}</td>
-          <td style="height:20px;"></td>
+          <td>${emp.name}</td><td>${emp.rate}</td><td>${emp.days}</td><td>${emp.ot}</td>
+          <td>${pesoFormat(emp.gross)}</td><td>${pesoFormat(emp.advance)}</td><td>${pesoFormat(emp.benefits)}</td>
+          <td>${pesoFormat(emp.net)}</td><td></td>
         </tr>`;
       });
-      rows+=`</tbody></table><br>
-      <div style="margin-top:20px;">Approved by:<br><br><u>DANA MALIWANAG</u><br>Signature over printed name</div>`;
+
+      const totals = siteTotals[site] || {gross:0,deductions:0,net:0};
+      rows+=`<tr>
+        <td colspan="4"><strong>Total</strong></td>
+        <td><strong>${pesoFormat(totals.gross)}</strong></td>
+        <td><strong>${pesoFormat(totals.deductions)}</strong></td>
+        <td><strong>${pesoFormat(totals.net)}</strong></td>
+        <td></td>
+      </tr>`;
+
       const win = window.open("", "_blank");
       win.document.write(`<html>
 <head>
@@ -388,17 +371,28 @@
   <h2>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h2>
   <h3>Payroll Report - ${site}</h3>
   <h3>Payroll Period: ${document.getElementById("payrollFrom").value} to ${document.getElementById("payrollTo").value}</h3>
-  ${rows}
-</body></html>`);
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th>
+        <th>Gross Pay</th><th>Cash Advance</th><th>Benefits</th><th>Net Pay</th><th>Signature</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows}
+    </tbody>
+  </table>
+</body>
+</html>`);
       win.print();
       win.close();
     }
 
     function exportCSV(){
-      let csv="Site,Name,Rate,Days Worked,OT Hours,Gross,Cash Advance,Benefits,Net\n";
+      let csv="Site,Name,Rate,Days Worked,OT Hours,Gross,Tax/Other Deductions,Net\n";
       for(let site in siteData){
         siteData[site].forEach(emp=>{
-          csv+=`${site},${emp.name},${emp.rate},${emp.days},${emp.ot},${emp.gross},${emp.advance},${emp.benefits},${emp.net}\n`;
+          csv+=`${site},${emp.name},${emp.rate},${emp.days},${emp.ot},${pesoFormat(emp.gross)},${pesoFormat(emp.deductions)},${pesoFormat(emp.net)}\n`;
         });
       }
       const blob=new Blob([csv],{type:"text/csv"});
@@ -418,7 +412,7 @@
         siteData = JSON.parse(savedSiteData);
 
         const select=document.getElementById("perSiteSelect");
-        select.innerHTML = "";
+        select.innerHTML="";
         sites.forEach(site=>{
           const option=document.createElement("option");
           option.value=site;
