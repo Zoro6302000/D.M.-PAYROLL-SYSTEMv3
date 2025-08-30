@@ -93,10 +93,6 @@
       <br>
       <button onclick="printSummary()">Print Payroll Summary</button>
       <button onclick="exportCSV()">Export Payroll to CSV</button>
-      <!-- Backup / Restore controls -->
-      <button onclick="exportJSON()">Export Backup</button>
-      <button onclick="document.getElementById('jsonImport').click()">Import Backup</button>
-      <input id="jsonImport" type="file" accept="application/json" style="display:none" onchange="importJSON(event)">
     </div>
   </div>
 
@@ -143,12 +139,9 @@
   </div>
 
   <script>
-    const STORAGE_KEY = "dmPayrollStateV1";
-
     let siteTotals = {};
     let sites = [];
-    let siteData = {};
-    let selectedSite = "";
+    let siteData = {};  
 
     function pesoFormat(num) {
       return "₱" + (parseFloat(num)||0).toLocaleString("en-PH",{minimumFractionDigits:2, maximumFractionDigits:2});
@@ -168,7 +161,7 @@
       document.getElementById("dashboardInterface").classList.add("hidden");
       document.getElementById("siteInterface").classList.add("hidden");
       if(mode==="dashboard"){document.getElementById("dashboardInterface").classList.remove("hidden");computePayroll();}
-      else {document.getElementById("siteInterface").classList.remove("hidden");renderSiteOptions();renderSiteTable();}
+      else {document.getElementById("siteInterface").classList.remove("hidden");renderSiteTable();}
     }
 
     function addNewSite(){
@@ -184,15 +177,11 @@
         select.appendChild(option);
         siteData[siteName]=[];
         select.value=siteName; // auto-select
-        selectedSite = siteName;
         renderSiteTable();
-        saveState();
       } else {
         alert("Site already exists.");
         document.getElementById("perSiteSelect").value=siteName;
-        selectedSite = siteName;
         renderSiteTable();
-        saveState();
       }
     }
 
@@ -206,11 +195,7 @@
         [...select.options].forEach(opt=>{if(opt.value===siteName) opt.remove();});
         document.querySelector("#perSiteTable tbody").innerHTML="";
         document.getElementById("perSiteSummaryBody").innerHTML="";
-        selectedSite = sites[0] || "";
-        renderSiteOptions();
-        saveState();
         alert("Site deleted successfully.");
-        computePayroll();
       }
     }
 
@@ -220,30 +205,10 @@
       if(!siteData[site]) siteData[site]=[];
       siteData[site].push({name:"",rate:"",days:"",ot:"",gross:0,advance:"",benefits:"",net:0});
       renderSiteTable();
-      saveState();
-    }
-
-    function renderSiteOptions(){
-      const select=document.getElementById("perSiteSelect");
-      const current = select.value;
-      select.innerHTML="";
-      sites.forEach(s=>{
-        const opt=document.createElement("option");
-        opt.value=s; opt.textContent=s;
-        select.appendChild(opt);
-      });
-      if(selectedSite && sites.includes(selectedSite)) {
-        select.value = selectedSite;
-      } else if (current && sites.includes(current)) {
-        select.value = current;
-      } else if (sites.length) {
-        select.value = sites[0];
-      }
     }
 
     function renderSiteTable(){
       const site=document.getElementById("perSiteSelect").value;
-      selectedSite = site || selectedSite;
       const tbody=document.querySelector("#perSiteTable tbody");
       tbody.innerHTML="";
       if(!site||!siteData[site]) return;
@@ -304,7 +269,6 @@
       input.value=val||"";
       siteData[site][idx][field]=val;
       computePayroll();
-      saveState();
     }
 
     function updateEmployee(site,idx,field,value){
@@ -313,7 +277,6 @@
       if(["advance","benefits","rate"].includes(field)&&num<0) num=0;
       siteData[site][idx][field]=(field==="name"?value:num);
       computePayroll();
-      saveState();
     }
 
     function computePayroll(){
@@ -348,7 +311,7 @@
 
     function updateDashboardSummary(){
       const tbody=document.querySelector("#siteSummary tbody");
-      tbody.innerHTML="";
+      tbody.innerHTML=""; 
       let gGross=0,gDed=0,gNet=0;
       for(let site in siteTotals){
         tbody.innerHTML+=`<tr>
@@ -378,107 +341,46 @@
       }
     }
 
-    // Dashboard print (clean layout, includes Payroll Period)
     function printSummary(){
-      const from=document.getElementById("payrollFrom").value;
-      const to=document.getElementById("payrollTo").value;
-      const period=(from && to) ? `Payroll Period: ${from} to ${to}` : "";
-
-      let rows = `<table border="1" cellspacing="0" cellpadding="6" width="100%">
-        <thead>
-          <tr>
-            <th>Site</th>
-            <th>Total Gross</th>
-            <th>Total Deductions</th>
-            <th>Total Net</th>
-          </tr>
-        </thead><tbody>`;
-
-      let gGross=0,gDed=0,gNet=0;
-      for(let site in siteTotals){
-        rows+=`<tr>
-          <td>${site}</td>
-          <td>${pesoFormat(siteTotals[site].gross)}</td>
-          <td>${pesoFormat(siteTotals[site].deductions)}</td>
-          <td>${pesoFormat(siteTotals[site].net)}</td>
-        </tr>`;
-        gGross+=siteTotals[site].gross;
-        gDed+=siteTotals[site].deductions;
-        gNet+=siteTotals[site].net;
-      }
-
-      rows+=`<tr>
-        <th>GRAND TOTAL</th>
-        <th>${pesoFormat(gGross)}</th>
-        <th>${pesoFormat(gDed)}</th>
-        <th>${pesoFormat(gNet)}</th>
-      </tr></tbody></table>`;
-
-      const win=window.open("","_blank");
-      win.document.write(`
-        <html><head><title>Payroll Summary</title>
-        <style>
-          body{font-family:Arial, sans-serif;margin:40px;}
-          h1,h2,h3{text-align:center;margin:5px 0;}
-          table{width:100%;border-collapse:collapse;margin-top:20px;}
-          th,td{border:1px solid #000;padding:6px;text-align:center;}
-          th{background:#ddd;}
-        </style></head><body>
-          <h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1>
-          <h2>Payroll Summary Report</h2>
-          <h3>${period}</h3>
-          ${rows}
-        </body></html>
-      `);
-      win.print();
-      win.close();
+      window.print();
     }
 
     function printSitePayroll(){
       const site=document.getElementById("perSiteSelect").value;
       if(!site){alert("Please select a site first.");return;}
-      const from=document.getElementById("payrollFrom").value;
-      const to=document.getElementById("payrollTo").value;
-      const period=(from && to)?`Payroll Period: ${from} to ${to}`:"";
-      let rows=`<table border="1" cellspacing="0" cellpadding="6" width="100%"><thead><tr><th>Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th><th>Gross Pay</th><th>Cash Advance</th><th>Benefits</th><th>Net Pay</th><th>Signature</th></tr></thead><tbody>`;
+      let rows=`<table border="1" cellspacing="0" cellpadding="5" width="auto">
+      <thead><tr>
+        <th>Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th>
+        <th>Gross Pay</th><th>Cash Advance</th><th>Benefits</th><th>Net Pay</th><th>Signature</th>
+      </tr></thead><tbody>`;
       siteData[site].forEach(emp=>{
         rows+=`<tr>
-          <td>${emp.name}</td>
-          <td>${pesoFormat(emp.rate)}</td>
-          <td>${emp.days}</td>
-          <td>${emp.ot}</td>
-          <td>${pesoFormat(emp.gross)}</td>
-          <td>${pesoFormat(emp.advance)}</td>
-          <td>${pesoFormat(emp.benefits)}</td>
-          <td>${pesoFormat(emp.net)}</td>
-          <td style="height:40px;"></td>
+          <td>${emp.name}</td><td>${pesoFormat(emp.rate)}</td><td>${emp.days}</td><td>${emp.ot}</td>
+          <td>${pesoFormat(emp.gross)}</td><td>${pesoFormat(emp.advance)}</td><td>${pesoFormat(emp.benefits)}</td><td>${pesoFormat(emp.net)}</td>
+          <td style="height:20px;"></td>
         </tr>`;
       });
-      rows+="</tbody></table>";
-      const win=window.open("","_blank");
-      win.document.write(`
-        <html><head><title>Payroll Report - ${site}</title>
-        <style>
-          body{font-family:Arial,sans-serif;margin:40px;}
-          h1,h2,h3{text-align:center;margin:5px 0;}
-          table{width:100%;border-collapse:collapse;margin-top:20px;}
-          th,td{border:1px solid #000;padding:6px;text-align:center;}
-          th{background:#ddd;}
-          footer{margin-top:60px;text-align:right;font-size:14px;}
-        </style></head><body>
-          <h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1>
-          <h2>Payroll Report - ${site}</h2>
-          <h3>${period}</h3>
-          ${rows}
-          <footer>
-            <div style="margin-top:60px;">
-              Approved by:<br><br><br>
-              <u>DANA MALIWANAG</u><br>
-              Signature over printed name
-            </div>
-          </footer>
-        </body></html>
-      `);
+      rows+=`</tbody></table><br>
+      <div style="margin-top:20px;">Approved by:<br><br><u>DANA MALIWANAG</u><br>Signature over printed name</div>`;
+      const win = window.open("", "_blank");
+win.document.write(`<html>
+<head>
+  <title>${site} Payroll</title>
+  <style>
+    @media print {
+      body { margin: 10px; font-family: Arial, sans-serif; }
+      h2, h3 { margin: 5px 0; text-align: center; }
+      table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+      th, td { border: 1px solid #000; padding: 5px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+  <h2>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h2>
+  <h3>Payroll Report - ${site}</h3>
+  <h3>Payroll Period: ${document.getElementById("payrollFrom").value} to ${document.getElementById("payrollTo").value}</h3>
+  ${rows}
+</body></html>`);
       win.print();
       win.close();
     }
@@ -496,96 +398,6 @@
       link.download="payroll.csv";
       link.click();
     }
-
-    // Backup / Restore JSON
-    function exportJSON(){
-      const from = document.getElementById("payrollFrom").value || "";
-      const to   = document.getElementById("payrollTo").value || "";
-      const payload = {
-        version: "1.0",
-        exportedAt: new Date().toISOString(),
-        sites,
-        siteData,
-        selectedSite: document.getElementById("perSiteSelect")?.value || "",
-        period: { from, to }
-      };
-      const blob = new Blob([JSON.stringify(payload, null, 2)], {type:"application/json"});
-      const a = document.createElement("a");
-      const y = new Date();
-      const pad = n => String(n).padStart(2,"0");
-      a.href = URL.createObjectURL(blob);
-      a.download = `payroll-backup-${y.getFullYear()}${pad(y.getMonth()+1)}${pad(y.getDate())}.json`;
-      a.click();
-    }
-
-    function importJSON(e){
-      const file = e.target.files[0];
-      if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        try{
-          const data = JSON.parse(reader.result);
-          if(!data || !Array.isArray(data.sites) || typeof data.siteData !== "object"){
-            alert("Invalid backup file."); 
-            e.target.value = ""; 
-            return;
-          }
-          sites = data.sites;
-          siteData = data.siteData;
-          selectedSite = data.selectedSite || "";
-          document.getElementById("payrollFrom").value = data.period?.from || "";
-          document.getElementById("payrollTo").value   = data.period?.to   || "";
-          renderSiteOptions();
-          const select = document.getElementById("perSiteSelect");
-          if(selectedSite && sites.includes(selectedSite)) select.value = selectedSite;
-          renderSiteTable();
-          computePayroll();
-          saveState();
-          alert("Backup imported.");
-        }catch(err){
-          alert("Failed to import backup.");
-        }finally{
-          e.target.value = "";
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    // Persistence
-    function saveState(){
-      const from=document.getElementById("payrollFrom").value || "";
-      const to=document.getElementById("payrollTo").value || "";
-      try{
-        const data={sites, siteData, selectedSite: document.getElementById("perSiteSelect")?.value || selectedSite, from, to};
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-      }catch(e){}
-    }
-
-    function loadState(){
-      try{
-        const raw=localStorage.getItem(STORAGE_KEY);
-        if(!raw) return;
-        const data=JSON.parse(raw);
-        sites = Array.isArray(data.sites)?data.sites:[];
-        siteData = typeof data.siteData==="object" && data.siteData? data.siteData : {};
-        selectedSite = data.selectedSite || "";
-        if(data.from) document.getElementById("payrollFrom").value = data.from;
-        if(data.to) document.getElementById("payrollTo").value = data.to;
-      }catch(e){}
-    }
-
-    // Init
-    document.addEventListener("DOMContentLoaded",()=>{
-      loadState();
-      renderSiteOptions();
-      if(selectedSite && sites.includes(selectedSite)){
-        document.getElementById("perSiteSelect").value = selectedSite;
-      }
-      computePayroll();
-      document.getElementById("payrollFrom").addEventListener("change", ()=>{renderSiteTable(); computePayroll(); saveState();});
-      document.getElementById("payrollTo").addEventListener("change", ()=>{renderSiteTable(); computePayroll(); saveState();});
-      document.getElementById("perSiteSelect").addEventListener("change", (e)=>{selectedSite=e.target.value; saveState();});
-    });
   </script>
 </body>
 </html>
