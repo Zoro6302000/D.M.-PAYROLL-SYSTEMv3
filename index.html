@@ -37,7 +37,9 @@
 <body>
   <div style="display:flex;align-items:center;justify-content:center;gap:15px;">
     <img src="DM LOGO.png" alt="Company Logo" style="height:120px;">
-    <div><h1>D.M. MALIWANAG BUILDERS AND ENTERPRISEPRISES</h1></div>
+    <div>
+      <h1>D.M. MALIWANAG BUILDERS AND ENTERPRISES</h1>
+    </div>
   </div>
 
   <div style="text-align:center;margin-top:5px;">
@@ -46,8 +48,8 @@
   </div>
 
   <div class="date">
-    Payroll Period:
-    <input type="date" id="payrollFrom"> to
+    Payroll Period: 
+    <input type="date" id="payrollFrom"> to 
     <input type="date" id="payrollTo">
   </div>
 
@@ -133,7 +135,7 @@
   <script>
     let siteTotals = {};
     let sites = [];
-    let siteData = {};
+    let siteData = {};  
 
     // persistence
     function saveData(){
@@ -157,12 +159,9 @@
         const select = document.getElementById("perSiteSelect");
         select.innerHTML = "";
         sites.forEach(s=>{
-          const opt = document.createElement("option");
-          opt.value = s;
-          opt.textContent = s;
-          select.appendChild(opt);
+          const opt=document.createElement("option");
+          opt.value=s; opt.textContent=s; select.appendChild(opt);
         });
-
         computePayroll();
       }
     }
@@ -201,7 +200,7 @@
         option.textContent=siteName;
         select.appendChild(option);
         siteData[siteName]=[];
-        select.value=siteName;
+        select.value=siteName; // auto-select
         renderSiteTable();
         saveData();
       } else {
@@ -218,11 +217,7 @@
       if(confirm("Are you sure you want to delete site: "+siteName+" ?")){
         sites=sites.filter(s=>s!==siteName);
         delete siteData[siteName];
-        select.innerHTML = "";
-        sites.forEach(s=>{
-          const opt=document.createElement("option");
-          opt.value=s; opt.textContent=s; select.appendChild(opt);
-        });
+        [...select.options].forEach(opt=>{if(opt.value===siteName) opt.remove();});
         document.querySelector("#perSiteTable tbody").innerHTML="";
         document.getElementById("perSiteSummaryBody").innerHTML="";
         saveData();
@@ -251,16 +246,16 @@
         emp.gross=gross;emp.net=net;
         const row=document.createElement("tr");
         row.innerHTML=`
-          <td><input type="text" class="nameInput" style="width:auto;min-width:200px;" value="${emp.name}"
-            oninput="this.value=this.value.toUpperCase(); updateEmployee('${site}',${idx},'name',this.value)"
+          <td><input type="text" class="nameInput" style="width:auto;min-width:200px;" value="${emp.name}" 
+            oninput="this.value=this.value.toUpperCase(); updateEmployee('${site}',${idx},'name',this.value)" 
             onkeydown="focusNext(event,this)" placeholder="NAME"></td>
-          <td><input type="number" value="${emp.rate?emp.rate:''}" class="rate" step="0.01"
+          <td><input type="number" value="${emp.rate?emp.rate:''}" class="rate" step="0.01" 
             oninput="updateEmployee('${site}',${idx},'rate',this.value)" onkeydown="focusNext(event,this)" placeholder="₱"></td>
           <td><input type="number" value="${emp.days?emp.days:''}" class="days" step="0.5"
-            onblur="validateHalfStep(this,'${site}',${idx},'days')"
+            onblur="validateHalfStep(this,'${site}',${idx},'days')" 
             onkeydown="focusNext(event,this)" placeholder="Days (Max ${getMaxDays()})"></td>
           <td><input type="number" value="${emp.ot?emp.ot:''}" class="ot" step="0.5"
-            onblur="validateHalfStep(this,'${site}',${idx},'ot')"
+            onblur="validateHalfStep(this,'${site}',${idx},'ot')" 
             onkeydown="focusNext(event,this)" placeholder="OT"></td>
           <td class="gross">${pesoFormat(emp.gross)}</td>
           <td><input type="number" value="${emp.advance?emp.advance:''}" class="advance" step="0.01"
@@ -346,7 +341,7 @@
 
     function updateDashboardSummary(){
       const tbody=document.querySelector("#siteSummary tbody");
-      tbody.innerHTML="";
+      tbody.innerHTML=""; 
       let gGross=0,gDed=0,gNet=0;
       for(let site in siteTotals){
         tbody.innerHTML+=`<tr>
@@ -376,7 +371,9 @@
       }
     }
 
-    function printSummary(){ window.print(); }
+    function printSummary(){
+      window.print();
+    }
 
     function printSitePayroll(){
       const site=document.getElementById("perSiteSelect").value;
@@ -386,7 +383,7 @@
       let bodyRows="";
       siteData[site].forEach(emp=>{
         bodyRows+=`<tr>
-          <td>${emp.name}</td><td>${pesoFormat(emp.rate)}</td><td>${emp.days}</td><td>${emp.ot}</td>
+          <td class="nameCol">${emp.name}</td><td>${pesoFormat(emp.rate)}</td><td>${emp.days}</td><td>${emp.ot}</td>
           <td>${pesoFormat(emp.gross)}</td><td>${pesoFormat(emp.advance)}</td><td>${pesoFormat(emp.benefits)}</td>
           <td>${pesoFormat(emp.net)}</td><td></td>
         </tr>`;
@@ -412,6 +409,7 @@
       h2, h3 { margin: 5px 0; text-align: center; }
       table { border-collapse: collapse; width: 100%; margin-top: 10px; }
       th, td { border: 1px solid #000; padding: 5px; text-align: center; }
+      th.nameCol, td.nameCol { white-space: nowrap; word-break: keep-all; hyphens: none; }
     }
   </style>
 </head>
@@ -422,7 +420,7 @@
   <table>
     <thead>
       <tr>
-        <th>Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th>
+        <th class="nameCol">Name</th><th>Rate/Day</th><th>Days Worked</th><th>OT Hours</th>
         <th>Gross Pay</th><th>Cash Advance</th><th>Benefits</th><th>Net Pay</th><th>Signature</th>
       </tr>
     </thead>
@@ -430,8 +428,7 @@
   </table>
   <br>
   <div style="margin-top:20px;">Approved by:<br><br><u>DANA MALIWANAG</u><br>Signature over printed name</div>
-</body>
-</html>`);
+</body></html>`);
       win.print();
       win.close();
     }
