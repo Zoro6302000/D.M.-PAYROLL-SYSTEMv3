@@ -206,7 +206,7 @@
         option.textContent=siteName;
         select.appendChild(option);
         siteData[siteName]=[];
-        select.value=siteName; // auto-select
+        select.value=siteName; 
         renderSiteTable();
         saveData();
       } else {
@@ -381,36 +381,48 @@
       window.print();
     }
 
+    // UPDATED: safe, aligned, no-wrap printing
     function printSitePayroll(){
-      const site=document.getElementById("perSiteSelect").value;
-      if(!site){alert("Please select a site first.");return;}
+      const site = document.getElementById("perSiteSelect").value;
+      if(!site){ alert("Please select a site first."); return; }
 
-      // build rows
-      let bodyRows="";
-      siteData[site].forEach(emp=>{
-        bodyRows+=`<tr>
-          <td class="nameCol">${emp.name}</td>
-          <td>${pesoFormat(emp.rate)}</td>
-          <td>${emp.days}</td>
-          <td>${emp.ot}</td>
-          <td>${pesoFormat(emp.gross)}</td>
-          <td>${pesoFormat(emp.advance)}</td>
-          <td>${pesoFormat(emp.benefits)}</td>
-          <td>${pesoFormat(emp.net)}</td>
+      // ensure latest figures
+      computePayroll();
+
+      const list = Array.isArray(siteData[site]) ? siteData[site] : [];
+      if(list.length === 0){ alert("No employees in this site."); return; }
+
+      let bodyRows = "";
+      list.forEach(emp=>{
+        const rate = Number(emp.rate)||0;
+        const days = Number(emp.days)||0;
+        const ot   = Number(emp.ot)||0;
+        const gross = Number(emp.gross)||0;
+        const adv   = Number(emp.advance)||0;
+        const ben   = Number(emp.benefits)||0;
+        const net   = Number(emp.net)||0;
+
+        bodyRows += `<tr>
+          <td class="nameCol">${emp.name||""}</td>
+          <td>${pesoFormat(rate)}</td>
+          <td>${days}</td>
+          <td>${ot}</td>
+          <td>${pesoFormat(gross)}</td>
+          <td>${pesoFormat(adv)}</td>
+          <td>${pesoFormat(ben)}</td>
+          <td>${pesoFormat(net)}</td>
           <td></td>
         </tr>`;
       });
 
-      // correct totals per column
-      const totals = siteData[site].reduce((a,e)=>({
-        gross: a.gross + (e.gross||0),
-        advance: a.advance + (parseFloat(e.advance)||0),
-        benefits: a.benefits + (parseFloat(e.benefits)||0),
-        net: a.net + (e.net||0)
+      const totals = list.reduce((a,e)=>({
+        gross: a.gross + (Number(e.gross)||0),
+        advance: a.advance + (Number(e.advance)||0),
+        benefits: a.benefits + (Number(e.benefits)||0),
+        net: a.net + (Number(e.net)||0)
       }), {gross:0, advance:0, benefits:0, net:0});
 
-      // totals row aligned to columns
-      bodyRows+=`<tr>
+      bodyRows += `<tr>
         <td colspan="4"><strong>Total</strong></td>
         <td><strong>${pesoFormat(totals.gross)}</strong></td>
         <td><strong>${pesoFormat(totals.advance)}</strong></td>
