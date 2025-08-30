@@ -375,32 +375,46 @@
       window.print();
     }
 
-    function printSitePayroll(){
-      const site=document.getElementById("perSiteSelect").value;
-      if(!site){alert("Please select a site first.");return;}
+   <script>
+function printSitePayroll(){
+  const site = document.getElementById("perSiteSelect").value
+  if(!site){ alert("Please select a site first."); return }
 
-      // build rows
-      let bodyRows="";
-      siteData[site].forEach(emp=>{
-        bodyRows+=`<tr>
-          <td class="nameCol">${emp.name}</td><td>${pesoFormat(emp.rate)}</td><td>${emp.days}</td><td>${emp.ot}</td>
-          <td>${pesoFormat(emp.gross)}</td><td>${pesoFormat(emp.advance)}</td><td>${pesoFormat(emp.benefits)}</td>
-          <td>${pesoFormat(emp.net)}</td><td></td>
-        </tr>`;
-      });
+  // build employee rows
+  let bodyRows = ""
+  siteData[site].forEach(emp=>{
+    bodyRows += `<tr>
+      <td class="nameCol">${emp.name}</td>
+      <td>${pesoFormat(emp.rate)}</td>
+      <td>${emp.days}</td>
+      <td>${emp.ot}</td>
+      <td>${pesoFormat(emp.gross)}</td>
+      <td>${pesoFormat(emp.advance)}</td>
+      <td>${pesoFormat(emp.benefits)}</td>
+      <td>${pesoFormat(emp.net)}</td>
+      <td></td>
+    </tr>`
+  })
 
-      // totals row
-      const totals = siteTotals[site] || {gross:0, deductions:0, net:0};
-      bodyRows+=`<tr>
-        <td colspan="4"><strong>Total</strong></td>
-        <td><strong>${pesoFormat(totals.gross)}</strong></td>
-        <td><strong>${pesoFormat(totals.deductions)}</strong></td>
-        <td><strong>${pesoFormat(totals.net)}</strong></td>
-        <td colspan="2"></td>
-      </tr>`;
+  // totals aligned to each column
+  const totals = siteData[site].reduce((a,e)=>({
+    gross: a.gross + (e.gross||0),
+    advance: a.advance + (parseFloat(e.advance)||0),
+    benefits: a.benefits + (parseFloat(e.benefits)||0),
+    net: a.net + (e.net||0)
+  }), {gross:0, advance:0, benefits:0, net:0})
 
-      const win = window.open("", "_blank");
-      win.document.write(`<html>
+  bodyRows += `<tr>
+    <td colspan="4"><strong>Total</strong></td>
+    <td><strong>${pesoFormat(totals.gross)}</strong></td>
+    <td><strong>${pesoFormat(totals.advance)}</strong></td>
+    <td><strong>${pesoFormat(totals.benefits)}</strong></td>
+    <td><strong>${pesoFormat(totals.net)}</strong></td>
+    <td></td>
+  </tr>`
+
+  const win = window.open("", "_blank")
+  win.document.write(`<html>
 <head>
   <title>${site} Payroll</title>
   <style>
@@ -428,9 +442,12 @@
   </table>
   <br>
   <div style="margin-top:20px;">Approved by:<br><br><u>DANA MALIWANAG</u><br>Signature over printed name</div>
-</body></html>`);
-      win.print();
-      win.close();
+</body></html>`)
+  win.print()
+  win.close()
+}
+</script>
+
     }
 
     function exportCSV(){
@@ -449,3 +466,4 @@
   </script>
 </body>
 </html>
+
